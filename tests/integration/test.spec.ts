@@ -90,7 +90,9 @@ describe("動作確認用", () => {
 
       capturer = new BrowserOperationCapturer(client, config, callbacks);
 
-      await capturer.start(url);
+      await capturer.start(url, () => {
+        /* Do nothing */
+      });
     } else {
       fail("URLが指定されていません。");
     }
