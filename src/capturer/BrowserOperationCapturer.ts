@@ -448,9 +448,8 @@ export default class BrowserOperationCapturer {
 
         case "change":
           if (operation.elementInfo.tagname.toLowerCase() === "select") {
-            await this.client.clickElement(
-              `${xpath}/option[@value="${operation.input}"]`
-            );
+            await this.client.clickElement(xpath);
+            await this.client.selectOption(xpath, operation.input);
           }
 
           if (operation.elementInfo.tagname.toLowerCase() === "input") {

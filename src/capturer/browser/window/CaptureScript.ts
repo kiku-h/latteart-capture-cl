@@ -45,9 +45,7 @@ export interface ExtendedDocument extends Document {
     elements: ElementInfo[];
     targetXPath: string;
   };
-  getAttributesFromElement?: (
-    elem: HTMLElement
-  ) => {
+  getAttributesFromElement?: (elem: HTMLElement) => {
     [key: string]: string;
   };
   collectVisibleElements?: (
