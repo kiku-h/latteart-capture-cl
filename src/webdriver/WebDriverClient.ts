@@ -175,5 +175,5 @@ export default interface WebDriverClient extends ScriptExecutor {
   /**
    * Select item in select box.
    */
-  selectOption(slectElementXpath: string, optionValue: string): Promise<void>;
+  selectOption(selectElementXpath: string, optionValue: string): Promise<void>;
 }
