@@ -339,9 +339,9 @@ export default class WebBrowser {
   ): Promise<void> {
     await this.client.execute(
       ({ windowHandle, shieldId, shieldStyle }) => {
-        console.log(
-          `injectFunctionToDetectWindowSwitch - START: ${windowHandle}`
-        );
+        // console.log(
+        //   `injectFunctionToDetectWindowSwitch - START: ${windowHandle}`
+        // );
 
         const extendedWindow: ExtendedWindowForWindowSwitch = window;
 
@@ -447,7 +447,7 @@ export default class WebBrowser {
           "blur",
           extendedWindow.removeWindowHandleToLocalStorage
         );
-        console.log(`injectFunctionToDetectWindowSwitch - END`);
+        // console.log(`injectFunctionToDetectWindowSwitch - END`);
       },
       {
         windowHandle,
