@@ -98,27 +98,17 @@ export default class WebDriverClientFactory {
   ): ThenableWebDriver {
     const caps = new Capabilities();
     caps.setPageLoadStrategy("eager");
+    const options = new Options();
     if (browserPath !== "") {
-      const options = new Options().setChromeBinaryPath(browserPath);
-      return new Builder()
-        .withCapabilities(caps)
-        .forBrowser("chrome")
-        .setChromeOptions(options)
-        .usingServer(serverUrl)
-        .build();
+      options.setChromeBinaryPath(browserPath);
     }
     if (isHeadlessMode) {
-      const options = new Options().addArguments("--headless");
-      return new Builder()
-        .withCapabilities(caps)
-        .forBrowser("chrome")
-        .setChromeOptions(options)
-        .usingServer(serverUrl)
-        .build();
+      options.addArguments("--headless");
     }
     return new Builder()
       .withCapabilities(caps)
       .forBrowser("chrome")
+      .setChromeOptions(options)
       .usingServer(serverUrl)
       .build();
   }
@@ -129,18 +119,14 @@ export default class WebDriverClientFactory {
   ): ThenableWebDriver {
     const caps = new Capabilities();
     caps.setPageLoadStrategy("eager");
+    const options = new EdgeOptions();
     if (isHeadlessMode) {
-      const options = new EdgeOptions().addArguments("--headless");
-      return new Builder()
-        .withCapabilities(caps)
-        .forBrowser("MicrosoftEdge")
-        .setEdgeOptions(options)
-        .usingServer(serverUrl)
-        .build();
+      options.addArguments("--headless");
     }
     return new Builder()
       .withCapabilities(caps)
       .forBrowser("MicrosoftEdge")
+      .setEdgeOptions(options)
       .usingServer(serverUrl)
       .build();
   }
