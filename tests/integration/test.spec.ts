@@ -117,6 +117,9 @@ describe("動作確認用", () => {
           tagname: "select",
           xpath: "/html/body/select",
           attributes: {},
+          text: "text",
+          ownedText: "ownedText",
+          value: "value",
         },
       });
 

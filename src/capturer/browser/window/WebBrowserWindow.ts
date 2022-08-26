@@ -490,6 +490,7 @@ export default class WebBrowserWindow {
           value: data.operation.elementInfo.value,
           xpath: data.operation.elementInfo.xpath,
           attributes: data.operation.elementInfo.attributes,
+          ownedText: data.operation.elementInfo.ownedText,
         };
         if (data.operation.elementInfo.checked !== undefined) {
           elementInfo.checked = data.operation.elementInfo.checked;

@@ -452,12 +452,21 @@ export default class CaptureScript {
             return `${parentXPath}/${tagNameWithIndex}`;
           })(path, element, allElements);
 
+          const ownedText = Array.from(element.childNodes)
+            .filter((node) => node.nodeType === Node.TEXT_NODE)
+            .map((textNode) => {
+              return textNode.textContent?.replace(/\s/g, "") ?? "";
+            })
+            .filter((text) => text !== "")
+            .join(" ");
+
           const newElement: ElementInfo = {
             tagname: element.tagName,
             text: element.innerText,
             value: element.value,
             xpath: currentXPath,
             attributes: extendedDocument.getAttributesFromElement(element),
+            ownedText,
           };
 
           if (element.checked !== undefined) {
@@ -545,12 +554,21 @@ export default class CaptureScript {
           return null;
         }
 
+        const ownedText = Array.from(element.childNodes)
+          .filter((node) => node.nodeType === Node.TEXT_NODE)
+          .map((textNode) => {
+            return textNode.textContent?.replace(/\s/g, "") ?? "";
+          })
+          .filter((text) => text !== "")
+          .join(" ");
+
         const elementInfo: ElementInfoWithBoundingRect = {
           tagname: element.tagName,
           text: element.innerText,
           value: element.value,
           xpath,
           attributes: extendedDocument.getAttributesFromElement(element),
+          ownedText,
           boundingRect: element.getBoundingClientRect(),
         };
         if (element.checked !== undefined) {
