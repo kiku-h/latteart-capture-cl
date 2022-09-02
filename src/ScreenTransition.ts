@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { ElementInfo } from "./Operation";
 import { TimestampImpl } from "./Timestamp";
 
 /**
@@ -49,6 +50,11 @@ export default class ScreenTransition {
    * Html page source.
    */
   public pageSource = "";
+
+  /**
+   * The screen elements in the screen that has been operated.
+   */
+  public screenElements: ElementInfo[] = [];
 
   /**
    * Constructor.
