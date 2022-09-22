@@ -67,6 +67,8 @@ describe("WebBrowserWindowは", () => {
               xpath: "xpath",
               attributes: { type: "date" },
               boundingRect: { top: 0, left: 0, width: 0, height: 0 },
+              ownedText: "ownedText",
+              value: "value",
             },
             title: "title",
             url: "url",
@@ -77,6 +79,8 @@ describe("WebBrowserWindowは", () => {
               text: "date",
               xpath: "xpath",
               attributes: { type: "date" },
+              ownedText: "ownedText",
+              value: "value",
             },
           ],
           suspendedEvent: {
@@ -114,6 +118,8 @@ describe("WebBrowserWindowは", () => {
           checked: false,
           attributes: { type: "type" },
           boundingRect: { top: 0, left: 0, width: 100, height: 200 },
+          ownedText: "ownedText",
+          value: "value",
         },
         title: "title",
         url: "url",
@@ -125,6 +131,8 @@ describe("WebBrowserWindowは", () => {
           xpath: "xpath",
           checked: false,
           attributes: { type: "type" },
+          ownedText: "ownedText",
+          value: "value",
         },
       ],
       suspendedEvent: {
@@ -145,6 +153,8 @@ describe("WebBrowserWindowは", () => {
           checked: false,
           attributes: { type: "type" },
           boundingRect: { top: 0, left: 0, width: 100, height: 200 },
+          ownedText: "ownedText",
+          value: "value",
         },
         title: "title",
         url: "url",
@@ -156,6 +166,8 @@ describe("WebBrowserWindowは", () => {
           xpath: "xpath",
           checked: false,
           attributes: { type: "type" },
+          ownedText: "ownedText",
+          value: "value",
         },
       ],
       suspendedEvent: {
@@ -180,6 +192,8 @@ describe("WebBrowserWindowは", () => {
               checked: false,
               attributes: { type: "radio" },
               boundingRect: { top: 0, left: 0, width: 100, height: 200 },
+              ownedText: "ownedText",
+              value: "value",
             },
             title: "title",
             url: "url",
@@ -191,6 +205,8 @@ describe("WebBrowserWindowは", () => {
               xpath: "xpath",
               checked: false,
               attributes: { type: "radio" },
+              ownedText: "ownedText",
+              value: "value",
             },
           ],
           suspendedEvent: {
@@ -210,6 +226,8 @@ describe("WebBrowserWindowは", () => {
               checked: false,
               attributes: { type: "checkbox" },
               boundingRect: { top: 0, left: 0, width: 100, height: 200 },
+              ownedText: "ownedText",
+              value: "value",
             },
             title: "title",
             url: "url",
@@ -221,6 +239,8 @@ describe("WebBrowserWindowは", () => {
               xpath: "xpath",
               checked: false,
               attributes: { type: "checkbox" },
+              ownedText: "ownedText",
+              value: "value",
             },
           ],
           suspendedEvent: {
@@ -239,6 +259,8 @@ describe("WebBrowserWindowは", () => {
           xpath: capturedDatas1[0].operation.elementInfo.xpath,
           attributes: capturedDatas1[0].operation.elementInfo.attributes,
           checked: capturedDatas1[0].operation.elementInfo.checked,
+          ownedText: capturedDatas1[0].operation.elementInfo.ownedText,
+          value: capturedDatas1[0].operation.elementInfo.value,
         },
         title: "",
         url: "",
@@ -378,6 +400,8 @@ describe("WebBrowserWindowは", () => {
         attributes: {
           value: "value",
         },
+        ownedText: "ownedText",
+        value: "value",
       };
 
       const actual = window.createCapturedOperation({
@@ -400,6 +424,11 @@ describe("WebBrowserWindowは", () => {
         pageSource: "",
         timestamp: expect.any(String),
       });
+    });
+
+    it("test", () => {
+      const a = "\n       \n       \n       \n       \n    a";
+      expect(a.replace(/\s/g, "")).toEqual("");
     });
 
     it("引数で指定されなかった項目はデフォルト値として生成する", () => {
