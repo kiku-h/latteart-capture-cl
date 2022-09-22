@@ -30,6 +30,13 @@ import { Key } from "selenium-webdriver";
 
 interface ExtendedDocumentForScreenTransition extends Document {
   __hasBeenObserved?: boolean;
+  extractElements?: (
+    parent: Element,
+    path: string
+  ) => {
+    elements: ElementInfo[];
+    targetXPath: string;
+  };
 }
 
 /**
@@ -132,6 +139,12 @@ export default class WebBrowserWindow {
    * Check if a screen transition is captured and if so, call the callback function.
    */
   public async captureScreenTransition(): Promise<void> {
+    const captureScript = new CaptureScript(this.client);
+
+    if (!(await captureScript.isReadyToCapture())) {
+      await captureScript.getReadyToCapture([WebBrowser.SHIELD_ID]);
+    }
+
     const currentDocumentLoadingIsCompleted =
       (await this.client.getDocumentReadyState()) === "complete";
     if (!currentDocumentLoadingIsCompleted) {
@@ -410,12 +423,28 @@ export default class WebBrowserWindow {
     if (!pageText) {
       return null;
     }
+
+    const screenElements =
+      (await this.client.execute(() => {
+        const extendedDocument: ExtendedDocumentForScreenTransition = document;
+        if (!extendedDocument.extractElements) {
+          return [];
+        }
+
+        const { elements } = extendedDocument.extractElements(
+          extendedDocument.body,
+          "/HTML/BODY"
+        );
+        return elements;
+      })) ?? [];
+
     return new ScreenTransition({
       windowHandle: this._windowHandle,
       title: this.currentScreenSummary.title,
       url: this.currentScreenSummary.url,
       imageData: this.currentOperationSummary.screenshotBase64,
       pageSource: pageText,
+      screenElements,
     });
   }
 
@@ -510,6 +539,7 @@ export default class WebBrowserWindow {
           value: data.operation.elementInfo.value,
           xpath: data.operation.elementInfo.xpath,
           attributes: data.operation.elementInfo.attributes,
+          ownedText: data.operation.elementInfo.ownedText,
         };
         if (data.operation.elementInfo.checked !== undefined) {
           elementInfo.checked = data.operation.elementInfo.checked;
