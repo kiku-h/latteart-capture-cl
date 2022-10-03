@@ -72,6 +72,8 @@ describe("WebBrowserWindowは", () => {
             },
             title: "title",
             url: "url",
+            scrollPosition: { x: 0, y: 0 },
+            windowInnerSize: { width: 0, height: 0 },
           },
           elements: [
             {
@@ -123,6 +125,8 @@ describe("WebBrowserWindowは", () => {
         },
         title: "title",
         url: "url",
+        scrollPosition: { x: 1, y: 2 },
+        windowInnerSize: { width: 10, height: 20 },
       },
       elements: [
         {
@@ -158,6 +162,8 @@ describe("WebBrowserWindowは", () => {
         },
         title: "title",
         url: "url",
+        scrollPosition: { x: 1, y: 2 },
+        windowInnerSize: { width: 10, height: 20 },
       },
       elements: [
         {
@@ -197,6 +203,8 @@ describe("WebBrowserWindowは", () => {
             },
             title: "title",
             url: "url",
+            scrollPosition: { x: 1, y: 2 },
+            windowInnerSize: { width: 10, height: 20 },
           },
           elements: [
             {
@@ -231,6 +239,8 @@ describe("WebBrowserWindowは", () => {
             },
             title: "title",
             url: "url",
+            scrollPosition: { x: 1, y: 2 },
+            windowInnerSize: { width: 10, height: 20 },
           },
           elements: [
             {
@@ -261,6 +271,7 @@ describe("WebBrowserWindowは", () => {
           checked: capturedDatas1[0].operation.elementInfo.checked,
           ownedText: capturedDatas1[0].operation.elementInfo.ownedText,
           value: capturedDatas1[0].operation.elementInfo.value,
+          boundingRect: capturedDatas1[0].operation.elementInfo.boundingRect,
         },
         title: "",
         url: "",
@@ -269,6 +280,8 @@ describe("WebBrowserWindowは", () => {
         timestamp: expect.any(String),
         screenElements: capturedDatas1[0].elements,
         pageSource: "pageSource",
+        scrollPosition: { x: 1, y: 2 },
+        windowInnerSize: { width: 10, height: 20 },
       });
 
       pullCapturedDatasSpy = jest.spyOn(
@@ -428,7 +441,7 @@ describe("WebBrowserWindowは", () => {
 
     it("test", () => {
       const a = "\n       \n       \n       \n       \n    a";
-      expect(a.replace(/\s/g, "")).toEqual("");
+      expect(a.replace(/\s/g, "")).toEqual("a");
     });
 
     it("引数で指定されなかった項目はデフォルト値として生成する", () => {

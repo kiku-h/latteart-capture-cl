@@ -51,6 +51,15 @@ export interface ElementInfo {
   attributes: { [key: string]: any };
 
   ownedText: string;
+  /**
+   * Bounding rectangle.
+   */
+  boundingRect?: {
+    top: number;
+    left: number;
+    width: number;
+    height: number;
+  };
 }
 
 /**
@@ -66,6 +75,16 @@ export class Operation {
    * Operation type.
    */
   public type = "";
+
+  /**
+   * Scroll position.
+   */
+  public scrollPosition: { x: number; y: number } | null = null;
+
+  /**
+   * Inner size of the browser window.
+   */
+  public windowInnerSize: { width: number; height: number } | null = null;
 
   /**
    * The screen element that has been operated.

@@ -20,7 +20,7 @@ import LoggingService from "../../../logger/LoggingService";
 import WebDriverClient from "@/webdriver/WebDriverClient";
 import ScreenSummary from "./ScreenSummary";
 import OperationSummary from "./OperationSummary";
-import MarkedScreenShotTaker from "./MarkedScreenshotTaker";
+import MarkedScreenShotTaker, { BoundingRect } from "./MarkedScreenshotTaker";
 import CaptureScript from "./CaptureScript";
 import { CapturedData } from "./CapturedData";
 import ScreenTransition from "../../../ScreenTransition";
@@ -245,6 +245,8 @@ export default class WebBrowserWindow {
     type: string;
     windowHandle: string;
     input?: string;
+    scrollPosition?: { x: number; y: number };
+    windowInnerSize?: { width: number; height: number };
     elementInfo?: ElementInfo;
     screenElements?: ElementInfo[];
     inputElements?: ElementInfo[];
@@ -253,6 +255,8 @@ export default class WebBrowserWindow {
     return new Operation({
       type: args.type,
       input: args.input ?? "",
+      scrollPosition: args.scrollPosition ?? null,
+      windowInnerSize: args.windowInnerSize ?? null,
       elementInfo: args.elementInfo ?? null,
       screenElements: args.screenElements ?? [],
       windowHandle: args.windowHandle,
@@ -490,6 +494,10 @@ export default class WebBrowserWindow {
         return false;
       }
 
+      if (!data.operation.elementInfo.boundingRect) {
+        throw new Error("bounding rect not found.");
+      }
+
       return true;
     });
 
@@ -500,7 +508,7 @@ export default class WebBrowserWindow {
     // Take a screenshot.
     const boundingRects = filteredDatas.map(
       (data) => data.operation.elementInfo.boundingRect
-    );
+    ) as BoundingRect[];
     const screenShotBase64 = await new MarkedScreenShotTaker(
       this.client
     ).takeScreenshotWithMarkOf(boundingRects);
@@ -520,6 +528,7 @@ export default class WebBrowserWindow {
           xpath: data.operation.elementInfo.xpath,
           attributes: data.operation.elementInfo.attributes,
           ownedText: data.operation.elementInfo.ownedText,
+          boundingRect: data.operation.elementInfo.boundingRect,
         };
         if (data.operation.elementInfo.checked !== undefined) {
           elementInfo.checked = data.operation.elementInfo.checked;
@@ -552,6 +561,8 @@ export default class WebBrowserWindow {
         return this.createCapturedOperation({
           input: data.operation.input,
           type: data.operation.type,
+          scrollPosition: data.operation.scrollPosition,
+          windowInnerSize: data.operation.windowInnerSize,
           elementInfo,
           screenElements: data.elements,
           windowHandle: this._windowHandle,
