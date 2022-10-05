@@ -20,7 +20,7 @@ import LoggingService from "../../../logger/LoggingService";
 import WebDriverClient from "@/webdriver/WebDriverClient";
 import ScreenSummary from "./ScreenSummary";
 import OperationSummary from "./OperationSummary";
-import MarkedScreenShotTaker from "./MarkedScreenshotTaker";
+import MarkedScreenShotTaker, { BoundingRect } from "./MarkedScreenshotTaker";
 import CaptureScript from "./CaptureScript";
 import { CapturedData } from "./CapturedData";
 import ScreenTransition from "../../../ScreenTransition";
@@ -207,13 +207,15 @@ export default class WebBrowserWindow {
 
     // Get and notice operations.
     const capturedDatas = await captureScript.pullCapturedDatas();
+    const clientSize = await this.client.getClientSize();
     if (capturedDatas.length === 0) {
       return;
     }
     for (const capturedData of capturedDatas) {
-      const capturedOperation = await this.convertToCapturedOperation([
-        capturedData,
-      ]);
+      const capturedOperation = await this.convertToCapturedOperation(
+        [capturedData],
+        clientSize
+      );
       this.noticeCapturedOperations(...capturedOperation);
 
       if (capturedData.suspendedEvent.reFireFromWebdriverType === "inputDate") {
@@ -245,6 +247,8 @@ export default class WebBrowserWindow {
     type: string;
     windowHandle: string;
     input?: string;
+    scrollPosition?: { x: number; y: number };
+    clientSize?: { width: number; height: number };
     elementInfo?: ElementInfo;
     screenElements?: ElementInfo[];
     inputElements?: ElementInfo[];
@@ -253,6 +257,8 @@ export default class WebBrowserWindow {
     return new Operation({
       type: args.type,
       input: args.input ?? "",
+      scrollPosition: args.scrollPosition,
+      clientSize: args.clientSize,
       elementInfo: args.elementInfo ?? null,
       screenElements: args.screenElements ?? [],
       windowHandle: args.windowHandle,
@@ -487,7 +493,10 @@ export default class WebBrowserWindow {
     return before.replace(/\[1\]/g, "");
   }
 
-  private async convertToCapturedOperation(capturedDatas: CapturedData[]) {
+  private async convertToCapturedOperation(
+    capturedDatas: CapturedData[],
+    clientSize: { width: number; height: number }
+  ) {
     const filteredDatas = capturedDatas.filter((data) => {
       // Ignore the click event when dropdown list is opened because Selenium can not take a screenshot when dropdown list is opened.
       if (
@@ -510,6 +519,10 @@ export default class WebBrowserWindow {
         return false;
       }
 
+      if (!data.operation.elementInfo.boundingRect) {
+        throw new Error("bounding rect not found.");
+      }
+
       return true;
     });
 
@@ -520,7 +533,7 @@ export default class WebBrowserWindow {
     // Take a screenshot.
     const boundingRects = filteredDatas.map(
       (data) => data.operation.elementInfo.boundingRect
-    );
+    ) as BoundingRect[];
     const screenShotBase64 = await new MarkedScreenShotTaker(
       this.client
     ).takeScreenshotWithMarkOf(boundingRects);
@@ -540,6 +553,7 @@ export default class WebBrowserWindow {
           xpath: data.operation.elementInfo.xpath,
           attributes: data.operation.elementInfo.attributes,
           ownedText: data.operation.elementInfo.ownedText,
+          boundingRect: data.operation.elementInfo.boundingRect,
         };
         if (data.operation.elementInfo.checked !== undefined) {
           elementInfo.checked = data.operation.elementInfo.checked;
@@ -572,6 +586,8 @@ export default class WebBrowserWindow {
         return this.createCapturedOperation({
           input: data.operation.input,
           type: data.operation.type,
+          scrollPosition: data.operation.scrollPosition,
+          clientSize,
           elementInfo,
           screenElements: data.elements,
           windowHandle: this._windowHandle,

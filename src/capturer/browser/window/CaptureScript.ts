@@ -17,12 +17,7 @@
 import LoggingService from "../../../logger/LoggingService";
 import { ElementInfo } from "@/Operation";
 import { ScriptExecutor } from "@/webdriver/WebDriverClient";
-import {
-  CapturedData,
-  OperationInfo,
-  EventInfo,
-  ElementInfoWithBoundingRect,
-} from "./CapturedData";
+import { CapturedData, OperationInfo, EventInfo } from "./CapturedData";
 import WebBrowser from "../WebBrowser";
 
 interface SendData {
@@ -55,7 +50,8 @@ export interface ExtendedDocument extends Document {
   buildOperationInfo?: (
     element: HTMLInputElement,
     xpath: string,
-    eventType: string
+    eventType: string,
+    window: Window
   ) => OperationInfo | null;
 }
 
@@ -546,7 +542,8 @@ export default class CaptureScript {
       extendedDocument.buildOperationInfo = (
         element: HTMLInputElement,
         xpath: string,
-        eventType: string
+        eventType: string,
+        window: Window
       ) => {
         const extendedDocument: ExtendedDocument = document;
 
@@ -561,15 +558,15 @@ export default class CaptureScript {
           })
           .filter((text) => text !== "")
           .join(" ");
-
-        const elementInfo: ElementInfoWithBoundingRect = {
+        const { top, left, width, height } = element.getBoundingClientRect();
+        const elementInfo: ElementInfo = {
           tagname: element.tagName,
           text: element.innerText,
           value: element.value,
           xpath,
           attributes: extendedDocument.getAttributesFromElement(element),
           ownedText,
-          boundingRect: element.getBoundingClientRect(),
+          boundingRect: { top, left, width, height },
         };
         if (element.checked !== undefined) {
           elementInfo.checked = element.checked;
@@ -581,6 +578,10 @@ export default class CaptureScript {
           elementInfo,
           title: extendedDocument.title,
           url: extendedDocument.URL,
+          scrollPosition: {
+            x: window.scrollX,
+            y: window.scrollY,
+          },
         };
       };
       return true;
@@ -639,7 +640,8 @@ export default class CaptureScript {
         const operation = extendedDocument.buildOperationInfo(
           targetElement,
           targetXPath,
-          event.type
+          event.type,
+          window
         );
 
         if (operation !== null) {
