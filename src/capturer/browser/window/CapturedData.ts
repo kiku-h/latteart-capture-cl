@@ -122,12 +122,4 @@ export interface OperationInfo {
     x: number;
     y: number;
   };
-
-  /**
-   * Browser innser size when capturing.
-   */
-  windowInnerSize: {
-    width: number;
-    height: number;
-  };
 }

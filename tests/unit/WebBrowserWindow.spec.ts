@@ -35,6 +35,7 @@ describe("WebBrowserWindowは", () => {
       getCurrentPageText: jest.fn().mockResolvedValueOnce("pageSource"),
       alertIsVisible: jest.fn().mockResolvedValue(true),
       sendKeys: jest.fn().mockResolvedValue(undefined),
+      getClientSize: jest.fn().mockResolvedValue({ width: 10, height: 20 }),
     };
     const onGetOperation: (operation: Operation) => void = jest.fn();
     const window: WebBrowserWindow = new WebBrowserWindow(
@@ -73,7 +74,6 @@ describe("WebBrowserWindowは", () => {
             title: "title",
             url: "url",
             scrollPosition: { x: 0, y: 0 },
-            windowInnerSize: { width: 0, height: 0 },
           },
           elements: [
             {
@@ -126,7 +126,7 @@ describe("WebBrowserWindowは", () => {
         title: "title",
         url: "url",
         scrollPosition: { x: 1, y: 2 },
-        windowInnerSize: { width: 10, height: 20 },
+        clientSize: { width: 10, height: 20 },
       },
       elements: [
         {
@@ -163,7 +163,7 @@ describe("WebBrowserWindowは", () => {
         title: "title",
         url: "url",
         scrollPosition: { x: 1, y: 2 },
-        windowInnerSize: { width: 10, height: 20 },
+        clientSize: { width: 10, height: 20 },
       },
       elements: [
         {
@@ -204,7 +204,6 @@ describe("WebBrowserWindowは", () => {
             title: "title",
             url: "url",
             scrollPosition: { x: 1, y: 2 },
-            windowInnerSize: { width: 10, height: 20 },
           },
           elements: [
             {
@@ -240,7 +239,6 @@ describe("WebBrowserWindowは", () => {
             title: "title",
             url: "url",
             scrollPosition: { x: 1, y: 2 },
-            windowInnerSize: { width: 10, height: 20 },
           },
           elements: [
             {
@@ -281,7 +279,7 @@ describe("WebBrowserWindowは", () => {
         screenElements: capturedDatas1[0].elements,
         pageSource: "pageSource",
         scrollPosition: { x: 1, y: 2 },
-        windowInnerSize: { width: 10, height: 20 },
+        clientSize: { width: 10, height: 20 },
       });
 
       pullCapturedDatasSpy = jest.spyOn(
@@ -301,6 +299,7 @@ describe("WebBrowserWindowは", () => {
         getCurrentPageText: jest.fn().mockResolvedValueOnce("pageSource"),
         alertIsVisible: jest.fn().mockResolvedValue(true),
         sendKeys: jest.fn().mockResolvedValue(undefined),
+        getClientSize: jest.fn().mockResolvedValue({ width: 10, height: 20 }),
       };
 
       onGetOperation = jest.fn();

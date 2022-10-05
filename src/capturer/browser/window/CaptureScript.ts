@@ -582,10 +582,6 @@ export default class CaptureScript {
             x: window.scrollX,
             y: window.scrollY,
           },
-          windowInnerSize: {
-            width: window.innerWidth,
-            height: window.innerHeight,
-          },
         };
       };
       return true;

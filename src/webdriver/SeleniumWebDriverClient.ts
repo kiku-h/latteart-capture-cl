@@ -430,4 +430,12 @@ export class SeleniumWebDriverClient implements WebDriverClient {
   public async getElementByTagName(tagName: string): Promise<WebElement[]> {
     return await this.driver.findElements(By.tagName(tagName));
   }
+
+  public async getClientSize(): Promise<{
+    width: number;
+    height: number;
+  }> {
+    const rect = await this.driver.manage().window().getRect();
+    return { width: rect.width, height: rect.height };
+  }
 }

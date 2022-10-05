@@ -207,13 +207,15 @@ export default class WebBrowserWindow {
 
     // Get and notice operations.
     const capturedDatas = await captureScript.pullCapturedDatas();
+    const clientSize = await this.client.getClientSize();
     if (capturedDatas.length === 0) {
       return;
     }
     for (const capturedData of capturedDatas) {
-      const capturedOperation = await this.convertToCapturedOperation([
-        capturedData,
-      ]);
+      const capturedOperation = await this.convertToCapturedOperation(
+        [capturedData],
+        clientSize
+      );
       this.noticeCapturedOperations(...capturedOperation);
 
       if (capturedData.suspendedEvent.reFireFromWebdriverType === "inputDate") {
@@ -246,7 +248,7 @@ export default class WebBrowserWindow {
     windowHandle: string;
     input?: string;
     scrollPosition?: { x: number; y: number };
-    windowInnerSize?: { width: number; height: number };
+    clientSize?: { width: number; height: number };
     elementInfo?: ElementInfo;
     screenElements?: ElementInfo[];
     inputElements?: ElementInfo[];
@@ -255,8 +257,8 @@ export default class WebBrowserWindow {
     return new Operation({
       type: args.type,
       input: args.input ?? "",
-      scrollPosition: args.scrollPosition ?? null,
-      windowInnerSize: args.windowInnerSize ?? null,
+      scrollPosition: args.scrollPosition,
+      clientSize: args.clientSize,
       elementInfo: args.elementInfo ?? null,
       screenElements: args.screenElements ?? [],
       windowHandle: args.windowHandle,
@@ -479,7 +481,10 @@ export default class WebBrowserWindow {
     return before.replace(/\[1\]/g, "");
   }
 
-  private async convertToCapturedOperation(capturedDatas: CapturedData[]) {
+  private async convertToCapturedOperation(
+    capturedDatas: CapturedData[],
+    clientSize: { width: number; height: number }
+  ) {
     const filteredDatas = capturedDatas.filter((data) => {
       // Ignore the click event when dropdown list is opened because Selenium can not take a screenshot when dropdown list is opened.
       if (
@@ -562,7 +567,7 @@ export default class WebBrowserWindow {
           input: data.operation.input,
           type: data.operation.type,
           scrollPosition: data.operation.scrollPosition,
-          windowInnerSize: data.operation.windowInnerSize,
+          clientSize,
           elementInfo,
           screenElements: data.elements,
           windowHandle: this._windowHandle,

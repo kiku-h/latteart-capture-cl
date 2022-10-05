@@ -79,12 +79,12 @@ export class Operation {
   /**
    * Scroll position.
    */
-  public scrollPosition: { x: number; y: number } | null = null;
+  public scrollPosition?: { x: number; y: number };
 
   /**
-   * Inner size of the browser window.
+   * Client size.
    */
-  public windowInnerSize: { width: number; height: number } | null = null;
+  public clientSize?: { width: number; height: number };
 
   /**
    * The screen element that has been operated.
