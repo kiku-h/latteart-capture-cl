@@ -27,6 +27,7 @@ import Autofill from "../webdriver/autofill";
  * The class for monitoring and getting browser operations.
  */
 export default class BrowserOperationCapturer {
+  public isReplay = false;
   private actionQueue: Array<(capturer: WebBrowser) => Promise<void>> = [];
 
   private client: WebDriverClient;
@@ -95,7 +96,11 @@ export default class BrowserOperationCapturer {
    * Start monitoring and capturing a page.
    * @param url Target URL.
    */
-  public async start(url: string, onStart: () => void): Promise<void> {
+  public async start(
+    url: string,
+    onStart: () => void,
+    clientSize?: { width: number; height: number }
+  ): Promise<void> {
     const browser = new WebBrowser(this.client, this.config, {
       onGetOperation: this.onGetOperation,
       onGetScreenTransition: this.onGetScreenTransition,
@@ -106,6 +111,9 @@ export default class BrowserOperationCapturer {
 
     try {
       await browser.open(url);
+      if (clientSize) {
+        await this.client.setWindowSize(clientSize.width, clientSize.height);
+      }
       onStart();
     } catch (error) {
       if (error instanceof Error) {
@@ -209,8 +217,8 @@ export default class BrowserOperationCapturer {
             await currentWindow.resumeCapturing();
           }
 
-          await currentWindow.captureScreenTransition();
-          await currentWindow.captureOperations();
+          await currentWindow.captureScreenTransition(!this.isReplay);
+          await currentWindow.captureOperations(!this.isReplay);
         }
       } catch (error) {
         if (!(error instanceof Error)) {
@@ -468,6 +476,23 @@ export default class BrowserOperationCapturer {
 
       if (elements.length === 0) {
         throw new Error("ElementNotFound");
+      }
+
+      if (operation.clientSize) {
+        console.log("beforeSetWindow");
+        await this.client.setWindowSize(
+          operation.clientSize.width,
+          operation.clientSize.height
+        );
+        console.log("AfterSetWindow");
+      }
+      if (operation.scrollPosition) {
+        console.log("beforeSetScrollPosition");
+        await this.client.setScrollPosition(
+          operation.scrollPosition.x,
+          operation.scrollPosition.y
+        );
+        console.log("afterSetScrollPosition");
       }
 
       switch (operation.type) {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { WebElement } from "selenium-webdriver";
+import { IRectangle, WebElement } from "selenium-webdriver";
 
 /**
  * The class for executing script.
@@ -208,8 +208,8 @@ export default interface WebDriverClient extends ScriptExecutor {
   /**
    * Get client size.
    */
-  getClientSize(): Promise<{
-    width: number;
-    height: number;
-  }>;
+  getClientSize(doSetCheck: boolean): Promise<IRectangle>;
+
+  setWindowSize(width: number, height: number): Promise<void>;
+  setScrollPosition(x: number, height: number): Promise<void>;
 }

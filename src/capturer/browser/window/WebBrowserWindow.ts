@@ -26,7 +26,7 @@ import { CapturedData } from "./CapturedData";
 import ScreenTransition from "../../../ScreenTransition";
 import WebBrowser from "../WebBrowser";
 import { SpecialOperationType } from "../../../SpecialOperationType";
-import { Key } from "selenium-webdriver";
+import { IRectangle, Key } from "selenium-webdriver";
 
 interface ExtendedDocumentForScreenTransition extends Document {
   __hasBeenObserved?: boolean;
@@ -138,7 +138,7 @@ export default class WebBrowserWindow {
   /**
    * Check if a screen transition is captured and if so, call the callback function.
    */
-  public async captureScreenTransition(): Promise<void> {
+  public async captureScreenTransition(resize: boolean): Promise<void> {
     const captureScript = new CaptureScript(this.client);
 
     if (!(await captureScript.isReadyToCapture())) {
@@ -172,7 +172,8 @@ export default class WebBrowserWindow {
       return;
     }
 
-    const screenTransition = await this.createScreenTransition();
+    const clientSize = await this.client.getClientSize(resize);
+    const screenTransition = await this.createScreenTransition(clientSize);
     if (!screenTransition) {
       return;
     }
@@ -198,7 +199,7 @@ export default class WebBrowserWindow {
   /**
    * Check if operations are captured and if so, call the callback function.
    */
-  public async captureOperations(): Promise<void> {
+  public async captureOperations(resize: boolean): Promise<void> {
     const captureScript = new CaptureScript(this.client);
 
     if (!(await captureScript.isReadyToCapture())) {
@@ -207,10 +208,11 @@ export default class WebBrowserWindow {
 
     // Get and notice operations.
     const capturedDatas = await captureScript.pullCapturedDatas();
-    const clientSize = await this.client.getClientSize();
     if (capturedDatas.length === 0) {
       return;
     }
+
+    const clientSize = await this.client.getClientSize(resize);
     for (const capturedData of capturedDatas) {
       const capturedOperation = await this.convertToCapturedOperation(
         [capturedData],
@@ -423,7 +425,9 @@ export default class WebBrowserWindow {
     };
   }
 
-  private async createScreenTransition(): Promise<ScreenTransition | null> {
+  private async createScreenTransition(
+    clientSize: IRectangle
+  ): Promise<ScreenTransition | null> {
     await this.updateScreenAndOperationSummary();
     const pageText = await this.client.getCurrentPageText();
     if (!pageText) {
@@ -451,6 +455,7 @@ export default class WebBrowserWindow {
       imageData: this.currentOperationSummary.screenshotBase64,
       pageSource: pageText,
       screenElements,
+      clientSize,
     });
   }
 

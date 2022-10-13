@@ -15,7 +15,14 @@
  */
 
 import WebDriverClient from "./WebDriverClient";
-import { Alert, By, Key, WebDriver, WebElement } from "selenium-webdriver";
+import {
+  Alert,
+  By,
+  IRectangle,
+  Key,
+  WebDriver,
+  WebElement,
+} from "selenium-webdriver";
 
 /**
  * Selenium WebDriver client.
@@ -29,6 +36,59 @@ export class SeleniumWebDriverClient implements WebDriverClient {
    */
   constructor(driver: WebDriver) {
     this.driver = driver;
+  }
+
+  public async setScrollPosition(x: number, y: number): Promise<void> {
+    console.log(`window.scrollTo(${x},${y});`);
+    return await this.driver.executeScript(`window.scrollTo(${x},${y});`);
+  }
+
+  public async setWindowSize(width: number, height: number): Promise<void> {
+    console.log("--- setWindowSize");
+    console.log("set", { height, width });
+    const rect = await this.driver.manage().window().setRect({ width, height });
+    console.log("result", rect);
+    // let diffWidth = 0;
+    // let diffHeight = 0;
+    // let succeed = false;
+    // for (let i = 0; i < 10; i++) {
+    //   console.log("count", i);
+    //   const rect = await this.driver.manage().window().getRect();
+    //   console.log("get", rect);
+    //   if (rect.width !== width || rect.height !== height) {
+    //     console.log("setRect", {
+    //       width: width - diffWidth,
+    //       height: height - diffHeight,
+    //     });
+    //     await this.driver
+    //       .manage()
+    //       .window()
+    //       .setRect({ width: width - diffWidth, height: height - diffHeight });
+    //     const beforeRect = await this.driver.manage().window().getRect();
+    //     console.log("result", beforeRect);
+    //     diffWidth =
+    //       beforeRect.width > width
+    //         ? diffWidth + 1
+    //         : beforeRect.width < width
+    //         ? diffWidth - 1
+    //         : diffWidth;
+    //     diffHeight =
+    //       beforeRect.height > height
+    //         ? diffHeight + 1
+    //         : beforeRect.height < height
+    //         ? beforeRect.height - 1
+    //         : diffHeight;
+    //   } else {
+    //     succeed = true;
+    //     break;
+    //   }
+    //   this.driver.sleep(500);
+    // }
+    // console.log(await this.driver.manage().window().getRect());
+    // if (!succeed) {
+    //   throw new Error("error set client size");
+    // }
+    console.log("--- setWindowSize", "end");
   }
 
   /**
@@ -431,11 +491,16 @@ export class SeleniumWebDriverClient implements WebDriverClient {
     return await this.driver.findElements(By.tagName(tagName));
   }
 
-  public async getClientSize(): Promise<{
-    width: number;
-    height: number;
-  }> {
+  public async getClientSize(doSetCheck = false): Promise<IRectangle> {
+    console.log("--- getClientSize");
     const rect = await this.driver.manage().window().getRect();
-    return { width: rect.width, height: rect.height };
+    console.log("get", rect);
+    const rect2 = await this.driver.manage().window().setRect(rect);
+    console.log("set", rect2);
+    const rect3 = await this.driver.manage().window().getRect();
+    console.log("get2", rect3);
+    console.log("--- end getClientSize");
+
+    return rect;
   }
 }
