@@ -27,7 +27,6 @@ import Autofill from "../webdriver/autofill";
  * The class for monitoring and getting browser operations.
  */
 export default class BrowserOperationCapturer {
-  public isReplay = false;
   private actionQueue: Array<(capturer: WebBrowser) => Promise<void>> = [];
 
   private client: WebDriverClient;

@@ -309,18 +309,12 @@ io.on("connection", (socket) => {
           async (operation: string) => {
             LoggingService.info("Run operation.");
             LoggingService.debug(operation);
-            console.log("---> START RUN OPERATION");
-            capturer.isReplay = true;
 
             const targetOperation: Operation = JSON.parse(operation);
             try {
               await capturer.runOperation(targetOperation);
-              capturer.isReplay = false;
-              console.log("---> END RUN OPERATION");
               socket.emit(ServerToClientSocketIOEvent.RUN_OPERATION_COMPLETED);
             } catch (error) {
-              capturer.isReplay = false;
-              console.log("---> END RUN OPERATION");
               if (!(error instanceof Error)) {
                 throw error;
               }
