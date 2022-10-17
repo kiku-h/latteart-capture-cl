@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { IRectangle } from "selenium-webdriver";
 import { ElementInfo } from "./Operation";
 import { TimestampImpl } from "./Timestamp";
 
@@ -57,7 +56,10 @@ export default class ScreenTransition {
    */
   public screenElements: ElementInfo[] = [];
 
-  public clientSize?: IRectangle;
+  /**
+   * Client size.
+   */
+  public clientSize?: { width: number; height: number };
 
   /**
    * Constructor.

@@ -112,7 +112,7 @@ export default class BrowserOperationCapturer {
     try {
       await browser.open(url);
       if (clientSize) {
-        await this.client.setWindowSize(clientSize.width, clientSize.height);
+        await this.client.setClientSize(clientSize.width, clientSize.height);
       }
       onStart();
     } catch (error) {
@@ -217,8 +217,8 @@ export default class BrowserOperationCapturer {
             await currentWindow.resumeCapturing();
           }
 
-          await currentWindow.captureScreenTransition(!this.isReplay);
-          await currentWindow.captureOperations(!this.isReplay);
+          await currentWindow.captureScreenTransition();
+          await currentWindow.captureOperations();
         }
       } catch (error) {
         if (!(error instanceof Error)) {
@@ -479,20 +479,17 @@ export default class BrowserOperationCapturer {
       }
 
       if (operation.clientSize) {
-        console.log("beforeSetWindow");
-        await this.client.setWindowSize(
+        await this.client.setClientSize(
           operation.clientSize.width,
           operation.clientSize.height
         );
-        console.log("AfterSetWindow");
       }
       if (operation.scrollPosition) {
-        console.log("beforeSetScrollPosition");
         await this.client.setScrollPosition(
           operation.scrollPosition.x,
           operation.scrollPosition.y
         );
-        console.log("afterSetScrollPosition");
+        await this.client.sleep(500);
       }
 
       switch (operation.type) {
