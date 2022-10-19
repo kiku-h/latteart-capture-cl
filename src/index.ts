@@ -149,7 +149,11 @@ io.on("connection", (socket) => {
    */
   socket.on(
     ClientToServerSocketIOEvent.START_CAPTURE,
-    async (url: string, config = "{}") => {
+    async (
+      url: string,
+      config = "{}",
+      clientSize?: { width: number; height: number }
+    ) => {
       LoggingService.info("Start capture.");
 
       const captureConfig = new CaptureConfig(JSON.parse(config));
@@ -338,12 +342,16 @@ io.on("connection", (socket) => {
           }
         );
 
-        await capturer.start(parsedUrl, () => {
-          socket.emit(
-            ServerToClientSocketIOEvent.CAPTURE_STARTED,
-            new TimestampImpl().epochMilliseconds().toString()
-          );
-        });
+        await capturer.start(
+          parsedUrl,
+          () => {
+            socket.emit(
+              ServerToClientSocketIOEvent.CAPTURE_STARTED,
+              new TimestampImpl().epochMilliseconds().toString()
+            );
+          },
+          clientSize
+        );
       } catch (error) {
         if (!(error instanceof Error)) {
           throw error;

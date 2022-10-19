@@ -57,6 +57,11 @@ export default class ScreenTransition {
   public screenElements: ElementInfo[] = [];
 
   /**
+   * Client size.
+   */
+  public clientSize?: { width: number; height: number };
+
+  /**
    * Constructor.
    * @param init The information for initialization.
    */

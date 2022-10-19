@@ -172,7 +172,8 @@ export default class WebBrowserWindow {
       return;
     }
 
-    const screenTransition = await this.createScreenTransition();
+    const clientSize = await this.client.getClientSize();
+    const screenTransition = await this.createScreenTransition(clientSize);
     if (!screenTransition) {
       return;
     }
@@ -207,10 +208,11 @@ export default class WebBrowserWindow {
 
     // Get and notice operations.
     const capturedDatas = await captureScript.pullCapturedDatas();
-    const clientSize = await this.client.getClientSize();
     if (capturedDatas.length === 0) {
       return;
     }
+
+    const clientSize = await this.client.getClientSize();
     for (const capturedData of capturedDatas) {
       const capturedOperation = await this.convertToCapturedOperation(
         [capturedData],
@@ -423,7 +425,10 @@ export default class WebBrowserWindow {
     };
   }
 
-  private async createScreenTransition(): Promise<ScreenTransition | null> {
+  private async createScreenTransition(clientSize: {
+    width: number;
+    height: number;
+  }): Promise<ScreenTransition | null> {
     await this.updateScreenAndOperationSummary();
     const pageText = await this.client.getCurrentPageText();
     if (!pageText) {
@@ -451,6 +456,7 @@ export default class WebBrowserWindow {
       imageData: this.currentOperationSummary.screenshotBase64,
       pageSource: pageText,
       screenElements,
+      clientSize,
     });
   }
 
