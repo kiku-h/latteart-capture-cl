@@ -204,4 +204,19 @@ export default interface WebDriverClient extends ScriptExecutor {
    * @param tagName
    */
   getElementByTagName(tagName: string): Promise<WebElement[]>;
+
+  /**
+   * Get client size.
+   */
+  getClientSize(): Promise<{ width: number; height: number }>;
+
+  /**
+   * Set client size.
+   */
+  setClientSize(width: number, height: number): Promise<void>;
+
+  /**
+   * Set scroll position.
+   */
+  setScrollPosition(x: number, height: number): Promise<void>;
 }

@@ -95,7 +95,11 @@ export default class BrowserOperationCapturer {
    * Start monitoring and capturing a page.
    * @param url Target URL.
    */
-  public async start(url: string, onStart: () => void): Promise<void> {
+  public async start(
+    url: string,
+    onStart: () => void,
+    clientSize?: { width: number; height: number }
+  ): Promise<void> {
     const browser = new WebBrowser(this.client, this.config, {
       onGetOperation: this.onGetOperation,
       onGetScreenTransition: this.onGetScreenTransition,
@@ -106,6 +110,9 @@ export default class BrowserOperationCapturer {
 
     try {
       await browser.open(url);
+      if (clientSize) {
+        await this.client.setClientSize(clientSize.width, clientSize.height);
+      }
       onStart();
     } catch (error) {
       if (error instanceof Error) {
@@ -473,6 +480,20 @@ export default class BrowserOperationCapturer {
 
       if (elements.length === 0) {
         throw new Error("ElementNotFound");
+      }
+
+      if (operation.clientSize) {
+        await this.client.setClientSize(
+          operation.clientSize.width,
+          operation.clientSize.height
+        );
+      }
+      if (operation.scrollPosition) {
+        await this.client.setScrollPosition(
+          operation.scrollPosition.x,
+          operation.scrollPosition.y
+        );
+        await this.client.sleep(500);
       }
 
       switch (operation.type) {

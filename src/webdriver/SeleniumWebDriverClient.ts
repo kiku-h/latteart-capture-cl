@@ -15,7 +15,14 @@
  */
 
 import WebDriverClient from "./WebDriverClient";
-import { Alert, By, Key, WebDriver, WebElement } from "selenium-webdriver";
+import {
+  Alert,
+  By,
+  IRectangle,
+  Key,
+  WebDriver,
+  WebElement,
+} from "selenium-webdriver";
 
 /**
  * Selenium WebDriver client.
@@ -29,6 +36,20 @@ export class SeleniumWebDriverClient implements WebDriverClient {
    */
   constructor(driver: WebDriver) {
     this.driver = driver;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public async setScrollPosition(x: number, y: number): Promise<void> {
+    return await this.driver.executeScript(`window.scrollTo(${x},${y});`);
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public async setClientSize(width: number, height: number): Promise<void> {
+    await this.driver.manage().window().setRect({ width, height });
   }
 
   /**
@@ -429,5 +450,10 @@ export class SeleniumWebDriverClient implements WebDriverClient {
 
   public async getElementByTagName(tagName: string): Promise<WebElement[]> {
     return await this.driver.findElements(By.tagName(tagName));
+  }
+
+  public async getClientSize(): Promise<{ width: number; height: number }> {
+    const rect = await this.driver.manage().window().getRect();
+    return { width: rect.width, height: rect.height };
   }
 }

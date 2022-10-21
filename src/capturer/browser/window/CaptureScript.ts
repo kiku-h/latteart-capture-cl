@@ -17,12 +17,7 @@
 import LoggingService from "../../../logger/LoggingService";
 import { ElementInfo } from "@/Operation";
 import { ScriptExecutor } from "@/webdriver/WebDriverClient";
-import {
-  CapturedData,
-  OperationInfo,
-  EventInfo,
-  ElementInfoWithBoundingRect,
-} from "./CapturedData";
+import { CapturedData, OperationInfo, EventInfo } from "./CapturedData";
 import WebBrowser from "../WebBrowser";
 
 interface SendData {
@@ -45,9 +40,7 @@ export interface ExtendedDocument extends Document {
     elements: ElementInfo[];
     targetXPath: string;
   };
-  getAttributesFromElement?: (
-    elem: HTMLElement
-  ) => {
+  getAttributesFromElement?: (elem: HTMLElement) => {
     [key: string]: string;
   };
   collectVisibleElements?: (
@@ -57,7 +50,8 @@ export interface ExtendedDocument extends Document {
   buildOperationInfo?: (
     element: HTMLInputElement,
     xpath: string,
-    eventType: string
+    eventType: string,
+    window: Window
   ) => OperationInfo | null;
 }
 
@@ -454,12 +448,21 @@ export default class CaptureScript {
             return `${parentXPath}/${tagNameWithIndex}`;
           })(path, element, allElements);
 
+          const ownedText = Array.from(element.childNodes)
+            .filter((node) => node.nodeType === Node.TEXT_NODE)
+            .map((textNode) => {
+              return textNode.textContent?.replace(/\s/g, "") ?? "";
+            })
+            .filter((text) => text !== "")
+            .join(" ");
+
           const newElement: ElementInfo = {
             tagname: element.tagName,
             text: element.innerText,
             value: element.value,
             xpath: currentXPath,
             attributes: extendedDocument.getAttributesFromElement(element),
+            ownedText,
           };
 
           if (element.checked !== undefined) {
@@ -539,7 +542,8 @@ export default class CaptureScript {
       extendedDocument.buildOperationInfo = (
         element: HTMLInputElement,
         xpath: string,
-        eventType: string
+        eventType: string,
+        window: Window
       ) => {
         const extendedDocument: ExtendedDocument = document;
 
@@ -547,13 +551,22 @@ export default class CaptureScript {
           return null;
         }
 
-        const elementInfo: ElementInfoWithBoundingRect = {
+        const ownedText = Array.from(element.childNodes)
+          .filter((node) => node.nodeType === Node.TEXT_NODE)
+          .map((textNode) => {
+            return textNode.textContent?.replace(/\s/g, "") ?? "";
+          })
+          .filter((text) => text !== "")
+          .join(" ");
+        const { top, left, width, height } = element.getBoundingClientRect();
+        const elementInfo: ElementInfo = {
           tagname: element.tagName,
           text: element.innerText,
           value: element.value,
           xpath,
           attributes: extendedDocument.getAttributesFromElement(element),
-          boundingRect: element.getBoundingClientRect(),
+          ownedText,
+          boundingRect: { top, left, width, height },
         };
         if (element.checked !== undefined) {
           elementInfo.checked = element.checked;
@@ -565,6 +578,10 @@ export default class CaptureScript {
           elementInfo,
           title: extendedDocument.title,
           url: extendedDocument.URL,
+          scrollPosition: {
+            x: window.scrollX,
+            y: window.scrollY,
+          },
         };
       };
       return true;
@@ -623,7 +640,8 @@ export default class CaptureScript {
         const operation = extendedDocument.buildOperationInfo(
           targetElement,
           targetXPath,
-          event.type
+          event.type,
+          window
         );
 
         if (operation !== null) {

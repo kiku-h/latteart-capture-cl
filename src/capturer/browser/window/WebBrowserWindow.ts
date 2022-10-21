@@ -20,7 +20,7 @@ import LoggingService from "../../../logger/LoggingService";
 import WebDriverClient from "@/webdriver/WebDriverClient";
 import ScreenSummary from "./ScreenSummary";
 import OperationSummary from "./OperationSummary";
-import MarkedScreenShotTaker from "./MarkedScreenshotTaker";
+import MarkedScreenShotTaker, { BoundingRect } from "./MarkedScreenshotTaker";
 import CaptureScript from "./CaptureScript";
 import { CapturedData } from "./CapturedData";
 import ScreenTransition from "../../../ScreenTransition";
@@ -30,6 +30,13 @@ import { Key } from "selenium-webdriver";
 
 interface ExtendedDocumentForScreenTransition extends Document {
   __hasBeenObserved?: boolean;
+  extractElements?: (
+    parent: Element,
+    path: string
+  ) => {
+    elements: ElementInfo[];
+    targetXPath: string;
+  };
 }
 
 /**
@@ -132,6 +139,12 @@ export default class WebBrowserWindow {
    * Check if a screen transition is captured and if so, call the callback function.
    */
   public async captureScreenTransition(): Promise<void> {
+    const captureScript = new CaptureScript(this.client);
+
+    if (!(await captureScript.isReadyToCapture())) {
+      await captureScript.getReadyToCapture([WebBrowser.SHIELD_ID]);
+    }
+
     const currentDocumentLoadingIsCompleted =
       (await this.client.getDocumentReadyState()) === "complete";
     if (!currentDocumentLoadingIsCompleted) {
@@ -159,7 +172,8 @@ export default class WebBrowserWindow {
       return;
     }
 
-    const screenTransition = await this.createScreenTransition();
+    const clientSize = await this.client.getClientSize();
+    const screenTransition = await this.createScreenTransition(clientSize);
     if (!screenTransition) {
       return;
     }
@@ -197,10 +211,13 @@ export default class WebBrowserWindow {
     if (capturedDatas.length === 0) {
       return;
     }
+
+    const clientSize = await this.client.getClientSize();
     for (const capturedData of capturedDatas) {
-      const capturedOperation = await this.convertToCapturedOperation([
-        capturedData,
-      ]);
+      const capturedOperation = await this.convertToCapturedOperation(
+        [capturedData],
+        clientSize
+      );
       this.noticeCapturedOperations(...capturedOperation);
 
       if (capturedData.suspendedEvent.reFireFromWebdriverType === "inputDate") {
@@ -232,6 +249,8 @@ export default class WebBrowserWindow {
     type: string;
     windowHandle: string;
     input?: string;
+    scrollPosition?: { x: number; y: number };
+    clientSize?: { width: number; height: number };
     elementInfo?: ElementInfo;
     screenElements?: ElementInfo[];
     inputElements?: ElementInfo[];
@@ -240,6 +259,8 @@ export default class WebBrowserWindow {
     return new Operation({
       type: args.type,
       input: args.input ?? "",
+      scrollPosition: args.scrollPosition,
+      clientSize: args.clientSize,
       elementInfo: args.elementInfo ?? null,
       screenElements: args.screenElements ?? [],
       windowHandle: args.windowHandle,
@@ -404,18 +425,38 @@ export default class WebBrowserWindow {
     };
   }
 
-  private async createScreenTransition(): Promise<ScreenTransition | null> {
+  private async createScreenTransition(clientSize: {
+    width: number;
+    height: number;
+  }): Promise<ScreenTransition | null> {
     await this.updateScreenAndOperationSummary();
     const pageText = await this.client.getCurrentPageText();
     if (!pageText) {
       return null;
     }
+
+    const screenElements =
+      (await this.client.execute(() => {
+        const extendedDocument: ExtendedDocumentForScreenTransition = document;
+        if (!extendedDocument.extractElements) {
+          return [];
+        }
+
+        const { elements } = extendedDocument.extractElements(
+          extendedDocument.body,
+          "/HTML/BODY"
+        );
+        return elements;
+      })) ?? [];
+
     return new ScreenTransition({
       windowHandle: this._windowHandle,
       title: this.currentScreenSummary.title,
       url: this.currentScreenSummary.url,
       imageData: this.currentOperationSummary.screenshotBase64,
       pageSource: pageText,
+      screenElements,
+      clientSize,
     });
   }
 
@@ -458,7 +499,10 @@ export default class WebBrowserWindow {
     return before.replace(/\[1\]/g, "");
   }
 
-  private async convertToCapturedOperation(capturedDatas: CapturedData[]) {
+  private async convertToCapturedOperation(
+    capturedDatas: CapturedData[],
+    clientSize: { width: number; height: number }
+  ) {
     const filteredDatas = capturedDatas.filter((data) => {
       // Ignore the click event when dropdown list is opened because Selenium can not take a screenshot when dropdown list is opened.
       if (
@@ -481,6 +525,10 @@ export default class WebBrowserWindow {
         return false;
       }
 
+      if (!data.operation.elementInfo.boundingRect) {
+        throw new Error("bounding rect not found.");
+      }
+
       return true;
     });
 
@@ -491,7 +539,7 @@ export default class WebBrowserWindow {
     // Take a screenshot.
     const boundingRects = filteredDatas.map(
       (data) => data.operation.elementInfo.boundingRect
-    );
+    ) as BoundingRect[];
     const screenShotBase64 = await new MarkedScreenShotTaker(
       this.client
     ).takeScreenshotWithMarkOf(boundingRects);
@@ -510,6 +558,8 @@ export default class WebBrowserWindow {
           value: data.operation.elementInfo.value,
           xpath: data.operation.elementInfo.xpath,
           attributes: data.operation.elementInfo.attributes,
+          ownedText: data.operation.elementInfo.ownedText,
+          boundingRect: data.operation.elementInfo.boundingRect,
         };
         if (data.operation.elementInfo.checked !== undefined) {
           elementInfo.checked = data.operation.elementInfo.checked;
@@ -542,6 +592,8 @@ export default class WebBrowserWindow {
         return this.createCapturedOperation({
           input: data.operation.input,
           type: data.operation.type,
+          scrollPosition: data.operation.scrollPosition,
+          clientSize,
           elementInfo,
           screenElements: data.elements,
           windowHandle: this._windowHandle,

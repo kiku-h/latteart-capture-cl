@@ -103,7 +103,7 @@ export interface OperationInfo {
   /**
    * The screen element that has been operated.
    */
-  elementInfo: ElementInfoWithBoundingRect;
+  elementInfo: ElementInfo;
 
   /**
    * The title of the screen that has been operated.
@@ -114,34 +114,12 @@ export interface OperationInfo {
    * The URL of the screen that has been operated.
    */
   url: string;
-}
 
-/**
- * Element information with bounding rect.
- */
-export interface ElementInfoWithBoundingRect extends ElementInfo {
   /**
-   * Bounding Rect.
+   * Scroll position during operation.
    */
-  boundingRect: {
-    /**
-     * Top.
-     */
-    top: number;
-
-    /**
-     * Left.
-     */
-    left: number;
-
-    /**
-     * Width.
-     */
-    width: number;
-
-    /**
-     * Height.
-     */
-    height: number;
+  scrollPosition: {
+    x: number;
+    y: number;
   };
 }

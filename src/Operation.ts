@@ -28,12 +28,12 @@ export interface ElementInfo {
   /**
    * The text of the element.
    */
-  text?: string;
+  text: string;
 
   /**
    * The value of the element.
    */
-  value?: string;
+  value: string;
 
   /**
    * The XPath of the element.
@@ -49,6 +49,17 @@ export interface ElementInfo {
    * The attributes of the element.
    */
   attributes: { [key: string]: any };
+
+  ownedText: string;
+  /**
+   * Bounding rectangle.
+   */
+  boundingRect?: {
+    top: number;
+    left: number;
+    width: number;
+    height: number;
+  };
 }
 
 /**
@@ -64,6 +75,16 @@ export class Operation {
    * Operation type.
    */
   public type = "";
+
+  /**
+   * Scroll position.
+   */
+  public scrollPosition?: { x: number; y: number };
+
+  /**
+   * Client size.
+   */
+  public clientSize?: { width: number; height: number };
 
   /**
    * The screen element that has been operated.

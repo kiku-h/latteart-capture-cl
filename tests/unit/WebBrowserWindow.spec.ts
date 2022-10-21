@@ -35,6 +35,7 @@ describe("WebBrowserWindowは", () => {
       getCurrentPageText: jest.fn().mockResolvedValueOnce("pageSource"),
       alertIsVisible: jest.fn().mockResolvedValue(true),
       sendKeys: jest.fn().mockResolvedValue(undefined),
+      getClientSize: jest.fn().mockResolvedValue({ width: 10, height: 20 }),
     };
     const onGetOperation: (operation: Operation) => void = jest.fn();
     const window: WebBrowserWindow = new WebBrowserWindow(
@@ -67,9 +68,12 @@ describe("WebBrowserWindowは", () => {
               xpath: "xpath",
               attributes: { type: "date" },
               boundingRect: { top: 0, left: 0, width: 0, height: 0 },
+              ownedText: "ownedText",
+              value: "value",
             },
             title: "title",
             url: "url",
+            scrollPosition: { x: 0, y: 0 },
           },
           elements: [
             {
@@ -77,6 +81,8 @@ describe("WebBrowserWindowは", () => {
               text: "date",
               xpath: "xpath",
               attributes: { type: "date" },
+              ownedText: "ownedText",
+              value: "value",
             },
           ],
           suspendedEvent: {
@@ -114,9 +120,13 @@ describe("WebBrowserWindowは", () => {
           checked: false,
           attributes: { type: "type" },
           boundingRect: { top: 0, left: 0, width: 100, height: 200 },
+          ownedText: "ownedText",
+          value: "value",
         },
         title: "title",
         url: "url",
+        scrollPosition: { x: 1, y: 2 },
+        clientSize: { width: 10, height: 20 },
       },
       elements: [
         {
@@ -125,6 +135,8 @@ describe("WebBrowserWindowは", () => {
           xpath: "xpath",
           checked: false,
           attributes: { type: "type" },
+          ownedText: "ownedText",
+          value: "value",
         },
       ],
       suspendedEvent: {
@@ -145,9 +157,13 @@ describe("WebBrowserWindowは", () => {
           checked: false,
           attributes: { type: "type" },
           boundingRect: { top: 0, left: 0, width: 100, height: 200 },
+          ownedText: "ownedText",
+          value: "value",
         },
         title: "title",
         url: "url",
+        scrollPosition: { x: 1, y: 2 },
+        clientSize: { width: 10, height: 20 },
       },
       elements: [
         {
@@ -156,6 +172,8 @@ describe("WebBrowserWindowは", () => {
           xpath: "xpath",
           checked: false,
           attributes: { type: "type" },
+          ownedText: "ownedText",
+          value: "value",
         },
       ],
       suspendedEvent: {
@@ -180,9 +198,12 @@ describe("WebBrowserWindowは", () => {
               checked: false,
               attributes: { type: "radio" },
               boundingRect: { top: 0, left: 0, width: 100, height: 200 },
+              ownedText: "ownedText",
+              value: "value",
             },
             title: "title",
             url: "url",
+            scrollPosition: { x: 1, y: 2 },
           },
           elements: [
             {
@@ -191,6 +212,8 @@ describe("WebBrowserWindowは", () => {
               xpath: "xpath",
               checked: false,
               attributes: { type: "radio" },
+              ownedText: "ownedText",
+              value: "value",
             },
           ],
           suspendedEvent: {
@@ -210,9 +233,12 @@ describe("WebBrowserWindowは", () => {
               checked: false,
               attributes: { type: "checkbox" },
               boundingRect: { top: 0, left: 0, width: 100, height: 200 },
+              ownedText: "ownedText",
+              value: "value",
             },
             title: "title",
             url: "url",
+            scrollPosition: { x: 1, y: 2 },
           },
           elements: [
             {
@@ -221,6 +247,8 @@ describe("WebBrowserWindowは", () => {
               xpath: "xpath",
               checked: false,
               attributes: { type: "checkbox" },
+              ownedText: "ownedText",
+              value: "value",
             },
           ],
           suspendedEvent: {
@@ -239,6 +267,9 @@ describe("WebBrowserWindowは", () => {
           xpath: capturedDatas1[0].operation.elementInfo.xpath,
           attributes: capturedDatas1[0].operation.elementInfo.attributes,
           checked: capturedDatas1[0].operation.elementInfo.checked,
+          ownedText: capturedDatas1[0].operation.elementInfo.ownedText,
+          value: capturedDatas1[0].operation.elementInfo.value,
+          boundingRect: capturedDatas1[0].operation.elementInfo.boundingRect,
         },
         title: "",
         url: "",
@@ -247,6 +278,8 @@ describe("WebBrowserWindowは", () => {
         timestamp: expect.any(String),
         screenElements: capturedDatas1[0].elements,
         pageSource: "pageSource",
+        scrollPosition: { x: 1, y: 2 },
+        clientSize: { width: 10, height: 20 },
       });
 
       pullCapturedDatasSpy = jest.spyOn(
@@ -266,6 +299,7 @@ describe("WebBrowserWindowは", () => {
         getCurrentPageText: jest.fn().mockResolvedValueOnce("pageSource"),
         alertIsVisible: jest.fn().mockResolvedValue(true),
         sendKeys: jest.fn().mockResolvedValue(undefined),
+        getClientSize: jest.fn().mockResolvedValue({ width: 10, height: 20 }),
       };
 
       onGetOperation = jest.fn();
@@ -378,6 +412,8 @@ describe("WebBrowserWindowは", () => {
         attributes: {
           value: "value",
         },
+        ownedText: "ownedText",
+        value: "value",
       };
 
       const actual = window.createCapturedOperation({
@@ -400,6 +436,11 @@ describe("WebBrowserWindowは", () => {
         pageSource: "",
         timestamp: expect.any(String),
       });
+    });
+
+    it("test", () => {
+      const a = "\n       \n       \n       \n       \n    a";
+      expect(a.replace(/\s/g, "")).toEqual("a");
     });
 
     it("引数で指定されなかった項目はデフォルト値として生成する", () => {
