@@ -15,14 +15,8 @@
  */
 
 import WebDriverClient from "./WebDriverClient";
-import {
-  Alert,
-  By,
-  IRectangle,
-  Key,
-  WebDriver,
-  WebElement,
-} from "selenium-webdriver";
+import { Alert, By, Key, WebDriver, WebElement } from "selenium-webdriver";
+import LoggingService from "../logger/LoggingService";
 
 /**
  * Selenium WebDriver client.
@@ -453,7 +447,22 @@ export class SeleniumWebDriverClient implements WebDriverClient {
   }
 
   public async getClientSize(): Promise<{ width: number; height: number }> {
-    const rect = await this.driver.manage().window().getRect();
+    let rect = await this.driver.manage().window().getRect();
+
+    for (let i = 0; i < 10; i++) {
+      const correctedRect = await this.driver.manage().window().setRect(rect);
+      if (rect.width === correctedRect.width && rect.height === rect.height) {
+        break;
+      }
+
+      LoggingService.warn(
+        `Correct client size: ${JSON.stringify(rect)} -> ${JSON.stringify(
+          correctedRect
+        )}`
+      );
+      rect = correctedRect;
+    }
+
     return { width: rect.width, height: rect.height };
   }
 }
