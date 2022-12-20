@@ -19,7 +19,7 @@ Start capturing operations.
             "type": "string" // "PC" or "Android" or "iOS"
           },
           "browserName": {
-            "type": "string" // "Chrome" or "Safari"
+            "type": "string" // "Chrome" or "Safari"　or "Edge"
           },
           "device": {
             "type": "object",
@@ -40,6 +40,9 @@ Start capturing operations.
           },
           "waitTimeForStartupReload": {
             "type": "number" // seconds
+          },
+          "isHeadlessMode": {
+            "type": "boolean"
           }
         }
       }
@@ -48,14 +51,6 @@ Start capturing operations.
 #### `stop_capture`
 
 Stop capturing operations.
-
-#### `pause_capture`
-
-Pause capturing operations.
-
-#### `resume_capture`
-
-Resume capturing operations.
 
 #### `take_screenshot`
 
@@ -77,26 +72,51 @@ Switch capturing window.
   - destWindowHandle
     - type: string
 
-#### `run_operations`
+#### `switch_cancel`
 
-Run operations.
+ウィンドウ切り替えを中止する
+
+#### `select_capturing_window`
+
+ウィンドウを選択する.
+
+#### `pause_capture`
+
+Pause capturing operations.
+
+#### `resume_capture`
+
+Resume capturing operations.
+
+#### `run_operation`
+
+Run operation.
 
 - arguments
   - operations
     - type: string(json)
       ```json
       {
-        "type": "array",
-        "items": {
-          "type": "object",
-          "properties": {
-            "input": {
-              "type": "string"
-            },
-            "type": {
-              "type": "string"
-            },
-            "elementInfo": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "imageData": {
+            "type": "string"
+          },
+          "windowHandle": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string"
+          },
+          "screenElements": {
+            "type": "array",
+            "items": {
               "type": "object",
               "properties": {
                 "tagname": {
@@ -123,82 +143,36 @@ Run operations.
                   }
                 }
               }
-            },
-            "title": {
-              "type": "string"
-            },
-            "url": {
-              "type": "string"
-            },
-            "imageData": {
-              "type": "string"
-            },
-            "windowHandle": {
-              "type": "string"
-            },
-            "timestamp": {
-              "type": "string"
-            },
-            "screenElements": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "tagname": {
-                    "type": "string"
-                  },
-                  "text": {
-                    "type": "string"
-                  },
-                  "value": {
-                    "type": "string"
-                  },
-                  "xpath": {
-                    "type": "string"
-                  },
-                  "checked": {
-                    "type": "boolean"
-                  },
-                  "attributes": {
-                    "type": "object",
-                    "patternProperties": {
-                      ".+$": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                }
-              }
-            },
-            "pageSource": {
-              "type": "string"
-            },
-            "inputElements": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "tagname": {
-                    "type": "string"
-                  },
-                  "text": {
-                    "type": "string"
-                  },
-                  "value": {
-                    "type": "string"
-                  },
-                  "xpath": {
-                    "type": "string"
-                  },
-                  "checked": {
-                    "type": "boolean"
-                  },
-                  "attributes": {
-                    "type": "object",
-                    "patternProperties": {
-                      ".+$": {
-                        "type": "string"
-                      }
+            }
+          },
+          "pageSource": {
+            "type": "string"
+          },
+          "inputElements": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "tagname": {
+                  "type": "string"
+                },
+                "text": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": "string"
+                },
+                "xpath": {
+                  "type": "string"
+                },
+                "checked": {
+                  "type": "boolean"
+                },
+                "attributes": {
+                  "type": "object",
+                  "patternProperties": {
+                    ".+$": {
+                      "type": "string"
                     }
                   }
                 }
@@ -208,59 +182,134 @@ Run operations.
         }
       }
       ```
-  - config
+
+#### `run_operation_and_screen_transition`
+
+操作と画面遷移を実行する
+
+- arguments
+  - operations
     - type: string(json)
       ```json
       {
         "type": "object",
         "properties": {
-          "platformName": {
-            "type": "string" // "PC" or "Android" or "iOS"
+          "title": {
+            "type": "string"
           },
-          "browserName": {
-            "type": "string" // "Chrome" or "Safari"
+          "url": {
+            "type": "string"
           },
-          "device": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string"
-              },
-              "name": {
-                "type": "string"
-              },
-              "osVersion": {
-                "type": "string"
+          "imageData": {
+            "type": "string"
+          },
+          "windowHandle": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string"
+          },
+          "screenElements": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "tagname": {
+                  "type": "string"
+                },
+                "text": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": "string"
+                },
+                "xpath": {
+                  "type": "string"
+                },
+                "checked": {
+                  "type": "boolean"
+                },
+                "attributes": {
+                  "type": "object",
+                  "patternProperties": {
+                    ".+$": {
+                      "type": "string"
+                    }
+                  }
+                }
               }
             }
           },
-          "platformVersion": {
+          "pageSource": {
             "type": "string"
           },
-          "waitTimeForStartupReload": {
-            "type": "number" // seconds
+          "inputElements": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "tagname": {
+                  "type": "string"
+                },
+                "text": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": "string"
+                },
+                "xpath": {
+                  "type": "string"
+                },
+                "checked": {
+                  "type": "boolean"
+                },
+                "attributes": {
+                  "type": "object",
+                  "patternProperties": {
+                    ".+$": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
       ```
 
-#### `stop_run_operations`
+#### `autofill`
 
-Stop running operations.
+操作を自動実行する
+
+- arguments
+  - inputValueSets
+    - type: string(json)
+      ```json
+      {
+        "type": "object",
+        "properties": {
+          "locatorType": {
+            "type": "string" // "id" or "id"
+          },
+          "locator": {
+            "type": "string"
+          },
+          "locatorMatchType": {
+            "type": "string" // "equals" or "contains"
+          },
+          "inputValue": {
+            "type": "string"
+          }
+        }
+      }
+      ```
 
 ### server -> client
 
 #### `capture_started`
 
 Capturing has started.
-
-#### `capture_paused`
-
-Capturing has paused.
-
-#### `capture_resumed`
-
-Capturing has resumed.
 
 #### `operation_captured`
 
@@ -493,17 +542,37 @@ Alert dialog(alert, confirm, prompt) visibility has been changed.
       }
       ```
 
-#### `run_operations_completed`
+#### `capture_paused`
 
-Running operations has completed.
+Capturing has paused.
 
-#### `run_operations_canceled`
+#### `capture_resumed`
 
-Running operations has canceled.
+Capturing has resumed.
 
-#### `run_operations_aborted`
+#### `run_operation_completed`
 
-Running operations has aborted.
+Running operation has completed.
+
+#### `run_operation_failed`
+
+操作の実行に失敗する。
+
+#### `autofill_completed`
+
+操作の自動実行が完了する。
+
+#### `run_operation_and_screen_transition_completed`
+
+操作と画面遷移の実行が完了する。
+
+#### `run_operation_and_screen_transition_failed`
+
+操作と画面遷移の実行に失敗する。
+
+#### `invalid_operation`
+
+無効な操作。
 
 #### `error_occurred`
 
