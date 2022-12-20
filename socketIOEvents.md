@@ -74,11 +74,11 @@ Switch capturing window.
 
 #### `switch_cancel`
 
-ウィンドウ切り替えを中止する
+ウィンドウ選択を中止する
 
 #### `select_capturing_window`
 
-ウィンドウを選択する.
+ウィンドウ選択を開始する
 
 #### `pause_capture`
 
@@ -185,7 +185,7 @@ Run operation.
 
 #### `run_operation_and_screen_transition`
 
-操作と画面遷移を実行する
+画面遷移を伴う操作を実行する
 
 - arguments
   - operations
@@ -280,26 +280,29 @@ Run operation.
 
 #### `autofill`
 
-操作を自動実行する
+画面要素に値を入力する
 
 - arguments
   - inputValueSets
     - type: string(json)
       ```json
       {
-        "type": "object",
-        "properties": {
-          "locatorType": {
-            "type": "string" // "id" or "id"
-          },
-          "locator": {
-            "type": "string"
-          },
-          "locatorMatchType": {
-            "type": "string" // "equals" or "contains"
-          },
-          "inputValue": {
-            "type": "string"
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "locatorType": {
+              "type": "string" // "id" or "xpath"
+            },
+            "locator": {
+              "type": "string"
+            },
+            "locatorMatchType": {
+              "type": "string" // "equals" or "contains"
+            },
+            "inputValue": {
+              "type": "string"
+            }
           }
         }
       }
@@ -556,23 +559,19 @@ Running operation has completed.
 
 #### `run_operation_failed`
 
-操作の実行に失敗する。
+操作の実行に失敗した旨の通知。
 
 #### `autofill_completed`
 
-操作の自動実行が完了する。
+画面要素への自動入力が完了した旨の通知。
 
 #### `run_operation_and_screen_transition_completed`
 
-操作と画面遷移の実行が完了する。
+操作に伴った画面遷移が完了した旨の通知。
 
 #### `run_operation_and_screen_transition_failed`
 
-操作と画面遷移の実行に失敗する。
-
-#### `invalid_operation`
-
-無効な操作。
+画面遷移を伴う操作の実行に失敗した旨の通知。
 
 #### `error_occurred`
 
