@@ -72,13 +72,13 @@ Switch capturing window.
   - destWindowHandle
     - type: string
 
-#### `switch_cancel`
+#### `unprotect_windows`
 
-ウィンドウ選択を中止する
+全ウィンドウのユーザー操作の抑止を解除する
 
-#### `select_capturing_window`
+#### `protect_windows`
 
-ウィンドウ選択を開始する
+全ウィンドウのユーザー操作を抑止する
 
 #### `pause_capture`
 
@@ -278,7 +278,7 @@ Run operation.
       }
       ```
 
-#### `autofill`
+#### `enter_values`
 
 画面要素に値を入力する
 
@@ -561,7 +561,7 @@ Running operation has completed.
 
 操作の実行に失敗した旨の通知。
 
-#### `autofill_completed`
+#### `enter_values_completed`
 
 画面要素への自動入力が完了した旨の通知。
 

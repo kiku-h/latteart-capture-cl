@@ -60,13 +60,13 @@ enum ClientToServerSocketIOEvent {
   BROWSER_BACK = "browser_back",
   BROWSER_FORWARD = "browser_forward",
   SWITCH_CAPTURING_WINDOW = "switch_capturing_window",
-  SWITCH_CANCEL = "switch_cancel",
-  SELECT_CAPTURING_WINDOW = "select_capturing_window",
+  UNPROTECT_WINDOWS = "unprotect_windows",
+  PROTECT_WINDOWS = "protect_windows",
   PAUSE_CAPTURE = "pause_capture",
   RESUME_CAPTURE = "resume_capture",
   RUN_OPERATION = "run_operation",
   RUN_OPERATION_AND_SCREEN_TRANSITION = "run_operation_and_screen_transition",
-  AUTOFILL = "autofill",
+  ENTER_VALUES = "enter_values",
 }
 
 /**
@@ -84,10 +84,9 @@ enum ServerToClientSocketIOEvent {
   CAPTURE_RESUMED = "capture_resumed",
   RUN_OPERATION_COMPLETED = "run_operation_completed",
   RUN_OPERATION_FAILED = "run_operation_failed",
-  AUTOFILL_COMPLETED = "autofill_completed",
+  ENTER_VALUES_COMPLETED = "enter_values_completed",
   RUN_OPERATION_AND_SCREEN_TRANSITION_COMPLETED = "run_operation_and_screen_transition_completed",
   RUN_OPERATION_AND_SCREEN_TRANSITION_FAILED = "run_operation_and_screen_transition_failed",
-  INVALID_OPERATION = "invalid_operation",
   ERROR_OCCURRED = "error_occurred",
 }
 
@@ -270,15 +269,12 @@ io.on("connection", (socket) => {
             capturer.switchCapturingWindow(JSON.parse(destWindowHandle));
           }
         );
-        socket.on(ClientToServerSocketIOEvent.SWITCH_CANCEL, async () => {
+        socket.on(ClientToServerSocketIOEvent.UNPROTECT_WINDOWS, async () => {
           capturer.switchCancel();
         });
-        socket.on(
-          ClientToServerSocketIOEvent.SELECT_CAPTURING_WINDOW,
-          async () => {
-            capturer.selectCapturingWindow();
-          }
-        );
+        socket.on(ClientToServerSocketIOEvent.PROTECT_WINDOWS, async () => {
+          capturer.selectCapturingWindow();
+        });
         socket.on(ClientToServerSocketIOEvent.PAUSE_CAPTURE, async () => {
           await capturer.pauseCapturing();
 
@@ -290,11 +286,11 @@ io.on("connection", (socket) => {
           socket.emit(ServerToClientSocketIOEvent.CAPTURE_RESUMED);
         });
         socket.on(
-          ClientToServerSocketIOEvent.AUTOFILL,
+          ClientToServerSocketIOEvent.ENTER_VALUES,
           async (inputValueSets: string) => {
             try {
               await capturer.autofill(JSON.parse(inputValueSets));
-              socket.emit(ServerToClientSocketIOEvent.AUTOFILL_COMPLETED);
+              socket.emit(ServerToClientSocketIOEvent.ENTER_VALUES_COMPLETED);
             } catch (e) {
               if (e instanceof Error) {
                 LoggingService.error("Autofill failed.", e);
