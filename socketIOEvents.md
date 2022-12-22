@@ -74,11 +74,11 @@ Switch capturing window.
 
 #### `unprotect_windows`
 
-全ウィンドウのユーザー操作の抑止を解除する
+Unsuppress user interaction on all windows.
 
 #### `protect_windows`
 
-全ウィンドウのユーザー操作を抑止する
+Suppress user interaction in all windows.
 
 #### `pause_capture`
 
@@ -93,7 +93,7 @@ Resume capturing operations.
 Run operation.
 
 - arguments
-  - operations
+  - operation
     - type: string(json)
       ```json
       {
@@ -185,10 +185,10 @@ Run operation.
 
 #### `run_operation_and_screen_transition`
 
-画面遷移を伴う操作を実行する
+Execution of operations involving screen transitions.
 
 - arguments
-  - operations
+  - operation
     - type: string(json)
       ```json
       {
@@ -280,7 +280,7 @@ Run operation.
 
 #### `enter_values`
 
-画面要素に値を入力する
+Enter values for screen elements.
 
 - arguments
   - inputValueSets
@@ -559,19 +559,19 @@ Running operation has completed.
 
 #### `run_operation_failed`
 
-操作の実行に失敗した旨の通知。
+Notification of failed operation execution.
 
 #### `enter_values_completed`
 
-画面要素への自動入力が完了した旨の通知。
+Notification that auto-filling of screen elements is complete.
 
 #### `run_operation_and_screen_transition_completed`
 
-操作に伴った画面遷移が完了した旨の通知。
+Notification that the screen transition associated with the operation has been completed.
 
 #### `run_operation_and_screen_transition_failed`
 
-画面遷移を伴う操作の実行に失敗した旨の通知。
+Notification to the effect that execution of operations involving screen transitions has failed.
 
 #### `error_occurred`
 
